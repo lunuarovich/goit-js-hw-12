@@ -3,6 +3,7 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 
 const galleryEl = document.querySelector(".gallery");
 const loaderEl = document.getElementById("loader");
+const loadMoreBtn = document.querySelector(".load-more");
 
 const lightbox = new SimpleLightbox(".gallery a", {
   captionsData: "alt",
@@ -10,49 +11,40 @@ const lightbox = new SimpleLightbox(".gallery a", {
 });
 
 export function createGallery(images) {
-  if (!Array.isArray(images) || images.length === 0) return;
-
   const markup = images
-    .map(
-      img => `
-    <li class="photo-card">
-      <a class="gallery-link" href="${img.largeImageURL}">
-        
-        <div class="img-wrapper">
-          <div class="loader img-loader"></div>
-
-          <img 
-            class="gallery-image img-hidden"
-            src="${img.webformatURL}" 
-            alt="${escapeHtml(img.tags)}"
-            loading="lazy"
-          />
+    .map(img => `
+      <li class="photo-card">
+        <a href="${img.largeImageURL}">
+          <div class="img-wrapper">
+            <div class="loader img-loader"></div>
+            <img
+              class="gallery-image img-hidden"
+              src="${img.webformatURL}"
+              alt="${img.tags}"
+              loading="lazy"
+            />
+          </div>
+        </a>
+        <div class="info">
+          <p class="info-item"><b>Likes</b> ${img.likes}</p>
+          <p class="info-item"><b>Views</b> ${img.views}</p>
+          <p class="info-item"><b>Comments</b> ${img.comments}</p>
+          <p class="info-item"><b>Downloads</b> ${img.downloads}</p>
         </div>
-
-      </a>
-
-      <div class="info">
-        <p class="info-item"><b>Likes</b><span>${img.likes}</span></p>
-        <p class="info-item"><b>Views</b><span>${img.views}</span></p>
-        <p class="info-item"><b>Comments</b><span>${img.comments}</span></p>
-        <p class="info-item"><b>Downloads</b><span>${img.downloads}</span></p>
-      </div>
-    </li>`
-    )
+      </li>
+    `)
     .join("");
 
   galleryEl.insertAdjacentHTML("beforeend", markup);
 
-  const cards = document.querySelectorAll(".photo-card");
-
-  cards.forEach(card => {
+  document.querySelectorAll(".photo-card").forEach(card => {
     const img = card.querySelector("img");
     const loader = card.querySelector(".img-loader");
 
     img.onload = () => {
       loader.remove();
-      img.classList.remove("img-hidden");
       img.classList.add("img-visible");
+      img.classList.remove("img-hidden");
     };
   });
 
@@ -64,18 +56,17 @@ export function clearGallery() {
 }
 
 export function showLoader() {
-  loaderEl.classList.add("visible");
+  loaderEl.classList.remove("hidden");
 }
 
 export function hideLoader() {
-  loaderEl.classList.remove("visible");
+  loaderEl.classList.add("hidden");
 }
 
-function escapeHtml(text = "") {
-  return text
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+export function showLoadMoreButton() {
+  loadMoreBtn.classList.remove("hidden");
+}
+
+export function hideLoadMoreButton() {
+  loadMoreBtn.classList.add("hidden");
 }

@@ -199,6 +199,22 @@ button[type="submit"]:hover {
   margin-bottom: 2px;
 }
 
+/* Load-more */
+.load-more {
+  margin: 20px auto;
+  display: block;
+  padding: 10px 20px;
+  background: #4e75ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
 @media (max-width: 1200px) {
   .photo-card {
     width: calc((100% - 40px) / 3);

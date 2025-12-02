@@ -1,4 +1,4 @@
-import { getImagesByQuery } from "./js/pixabay-api.js";
+import { getImagesByQuery, PER_PAGE } from "./js/pixabay-api.js";
 import {
   createGallery,
   clearGallery,
@@ -38,7 +38,7 @@ async function onSubmit(e) {
 
   try {
     const data = await getImagesByQuery(query, page);
-    totalPages = Math.ceil(data.totalHits / 15);
+    totalPages = Math.ceil(data.totalHits / PER_PAGE);
 
     if (data.hits.length === 0) {
       iziToast.info({ message: "No images found" });
@@ -52,45 +52,47 @@ async function onSubmit(e) {
     else showEndMessage();
   } catch (error) {
     iziToast.error({ message: "Error loading data" });
+    console.error(error);
   } finally {
     hideLoader();
   }
 }
 
 async function onLoadMore() {
-  page += 1;
+  hideLoadMoreButton();
   showLoader();
+
+  page += 1;
 
   try {
     const data = await getImagesByQuery(query, page);
     createGallery(data.hits);
 
-    smoothScroll();
+    requestAnimationFrame(() => smoothScroll());
 
-    if (page >= totalPages) {
-      hideLoadMoreButton();
-      showEndMessage();
+    if (page < Math.ceil(data.totalHits / PER_PAGE)) {
+      showLoadMoreButton();
+    } else {
+      iziToast.info({ message: "We're sorry, but you've reached the end of search results." });
     }
-  } catch {
+  } catch (error) {
     iziToast.error({ message: "Load more failed" });
+    console.error(error);
   } finally {
     hideLoader();
   }
 }
 
-function showEndMessage() {
-  iziToast.info({
-    message: "We're sorry, but you've reached the end of search results.",
+function smoothScroll() {
+  const card = document.querySelector(".photo-card");
+  if (!card) return;
+  const { height } = card.getBoundingClientRect();
+  window.scrollBy({
+    top: height * 2,
+    behavior: "smooth",
   });
 }
 
-function smoothScroll() {
-  const cardHeight = document
-    .querySelector(".photo-card")
-    .getBoundingClientRect().height;
-
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: "smooth",
-  });
+function showEndMessage() {
+  iziToast.info({ message: "We're sorry, but you've reached the end of search results." });
 }

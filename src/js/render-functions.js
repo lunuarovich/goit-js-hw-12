@@ -37,15 +37,22 @@ export function createGallery(images) {
 
   galleryEl.insertAdjacentHTML("beforeend", markup);
 
-  document.querySelectorAll(".photo-card").forEach(card => {
+  const newCards = galleryEl.querySelectorAll(".photo-card");
+  newCards.forEach(card => {
     const img = card.querySelector("img");
     const loader = card.querySelector(".img-loader");
 
-    img.onload = () => {
-      loader.remove();
-      img.classList.add("img-visible");
+    img.addEventListener("load", () => {
+      if (loader) loader.remove();
       img.classList.remove("img-hidden");
-    };
+      img.classList.add("img-visible");
+    });
+
+    img.addEventListener("error", () => {
+      if (loader) loader.remove();
+      img.classList.remove("img-hidden");
+      img.classList.add("img-visible");
+    });
   });
 
   lightbox.refresh();
@@ -56,17 +63,20 @@ export function clearGallery() {
 }
 
 export function showLoader() {
-  loaderEl.classList.remove("hidden");
+  if (loadMoreBtn) loadMoreBtn.classList.add("hidden");
+  if (loaderEl) loaderEl.classList.remove("hidden");
 }
 
 export function hideLoader() {
-  loaderEl.classList.add("hidden");
+  if (loaderEl) loaderEl.classList.add("hidden");
 }
 
 export function showLoadMoreButton() {
-  loadMoreBtn.classList.remove("hidden");
+  if (loaderEl) loaderEl.classList.add("hidden");
+  if (loadMoreBtn) loadMoreBtn.classList.remove("hidden");
 }
 
 export function hideLoadMoreButton() {
-  loadMoreBtn.classList.add("hidden");
+  if (loadMoreBtn) loadMoreBtn.classList.add("hidden");
+  if (loaderEl) loaderEl.classList.add("hidden");
 }

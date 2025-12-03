@@ -40,7 +40,7 @@ async function onSubmit(e) {
     const data = await getImagesByQuery(query, page);
     totalPages = Math.ceil(data.totalHits / PER_PAGE);
 
-    if (data.hits.length === 0) {
+    if (!data.hits || data.hits.length === 0) {
       iziToast.info({ message: "No images found" });
       return;
     }
@@ -48,11 +48,14 @@ async function onSubmit(e) {
     createGallery(data.hits);
     iziToast.success({ message: `Found ${data.totalHits} images` });
 
-    if (page < totalPages) showLoadMoreButton();
-    else showEndMessage();
+    if (page < totalPages) {
+      showLoadMoreButton();
+    } else {
+      showEndMessage();
+    }
   } catch (error) {
-    iziToast.error({ message: "Error loading data" });
     console.error(error);
+    iziToast.error({ message: "Error loading data" });
   } finally {
     hideLoader();
   }
@@ -76,8 +79,8 @@ async function onLoadMore() {
       iziToast.info({ message: "We're sorry, but you've reached the end of search results." });
     }
   } catch (error) {
-    iziToast.error({ message: "Load more failed" });
     console.error(error);
+    iziToast.error({ message: "Load more failed" });
   } finally {
     hideLoader();
   }
